@@ -40,7 +40,7 @@ jobs:
   test-frontend:
     <<: *defaults
     steps:
-      - Checkout
+      - checkout
       - restore_cache:
           keys: [frontend-build]
       - run:
@@ -52,7 +52,7 @@ jobs:
   test-backend:
     <<: *defaults
     steps:
-      - Checkout
+      - checkout
       - restore_cache:
           keys: [backend-build]
       - run:
