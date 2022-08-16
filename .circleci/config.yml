@@ -199,5 +199,7 @@ workflows:
           requires: [scan-frontend, scan-backend]
       - configure-infrastructure:
           requires: [deploy-infrastructure]
-      - clean-up:
+      - run-migrations:
           requires: [configure-infrastructure]
+      - clean-up:
+          requires: [run-migrations]
