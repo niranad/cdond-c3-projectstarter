@@ -104,6 +104,7 @@ jobs:
       - image: amazon/aws-cli
     steps:
       - checkout
+      - run: yum -y install tar gzip
       - run:
           name: Ensure back-end infrastructure exists
           command: |
@@ -128,8 +129,27 @@ jobs:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
-      
       - destroy-environment     
+
+  # configure-infrastructure:
+  #   docker:
+  #     - image: ansible
+  #   steps:
+  #     - checkout
+  #     - ssh_keys:
+  #         Fingerprint: [""]
+  #     - attach_workspace:
+  #     - run:
+  #         name: Install dependencies
+  #         command: |
+  #           # Your code here
+  #           exit 1
+  #     - run:
+  #         name: Configure server
+  #         command: |
+  #           # Your code here
+  #           exit 1
+  #     # Here's where you will add some code to rollback on failure      
 
 
 
