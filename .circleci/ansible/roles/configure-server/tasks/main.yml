@@ -1,0 +1,38 @@
+---
+
+- name: 'update apt packages'
+  become: yes
+  apt:
+    update_cache: yes
+
+- name: 'upgrade apt packages'
+  become: yes
+  apt:
+    upgrade: yes
+
+- name: 'remove dependencies that are no longer required'
+  become: yes
+  apt:
+    autoremove: yes
+
+- name: "install python for Ansible."
+  become: yes
+  apt:
+    name: ['python']
+    state: 3.7
+    update_cache: yes
+
+- name: 'install nodejs'
+  become: yes
+  apt:
+    name: ['nodejs', 'npm']
+    state: latest
+    update_cache: yes
+
+- name: 'install pm2'
+  become: yes
+  npm:
+    name: 'pm2'
+    global: yes
+    production: yes
+    

@@ -5,7 +5,7 @@ defaults: &defaults
     - image: circleci/node:13.8.0
 
 commands:
-  destroy-environment:
+  destroy-environments:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID
     steps:
       - run:
@@ -129,28 +129,37 @@ jobs:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
-      - destroy-environment     
+      - destroy-environments     
 
-  # configure-infrastructure:
-  #   docker:
-  #     - image: ansible
-  #   steps:
-  #     - checkout
-  #     - ssh_keys:
-  #         Fingerprint: [""]
-  #     - attach_workspace:
-  #     - run:
-  #         name: Install dependencies
-  #         command: |
-  #           # Your code here
-  #           exit 1
-  #     - run:
-  #         name: Configure server
-  #         command: |
-  #           # Your code here
-  #           exit 1
-  #     # Here's where you will add some code to rollback on failure      
+  configure-infrastructure:
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints: ["b2:f0:30:9b:12:39:29:19:00:49:a7:76:b1:d4:eb:9b"]
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update ansible
+      - run:
+          name: Configure server
+          command: |
+            cd .circleci/ansible
+            ansible-playbook -i inventory.txt configure-server.yml 
+      - destroy-environments     
 
+  clean-up: 
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - run:
+          name: 'Clean up'
+          command: |
+            aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7} --region us-east-2
+            aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7} --region us-east-2
 
 
 workflows:
@@ -168,3 +177,7 @@ workflows:
           requires: [build-backend]
       - deploy-infrastructure:
           requires: [scan-frontend, scan-backend]
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
+      - clean-up:
+          requires: [configure-infrastructure]
